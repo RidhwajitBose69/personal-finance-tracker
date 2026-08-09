@@ -1,0 +1,24 @@
+services:
+  - type: web
+    name: personal-finance-tracker-api
+    runtime: docker
+    rootDir: backend
+    plan: free
+    envVars:
+      - key: MONGODB_URI
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: PORT
+        value: 3000
+
+  - type: web
+    name: personal-finance-tracker-web
+    runtime: docker
+    rootDir: frontend
+    plan: free
+    envVars:
+      - key: BACKEND_URL
+        sync: false

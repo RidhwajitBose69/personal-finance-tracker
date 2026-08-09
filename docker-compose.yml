@@ -1,0 +1,40 @@
+services:
+  mongodb:
+    image: mongo:8
+    container_name: finance-mongodb
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - finance_mongodb_data:/data/db
+
+  backend:
+    build: ./backend
+    container_name: finance-backend
+    restart: unless-stopped
+    depends_on:
+      - mongodb
+    environment:
+      PORT: 3000
+      MONGODB_URI: mongodb://mongodb:27017/finance-tracker
+      JWT_SECRET: ${JWT_SECRET:-change-this-local-secret}
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+    ports:
+      - "3000:3000"
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        VITE_API_URL: http://localhost:3000/api
+    container_name: finance-frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    environment:
+      BACKEND_URL: http://backend:3000
+    ports:
+      - "5173:80"
+
+volumes:
+  finance_mongodb_data:

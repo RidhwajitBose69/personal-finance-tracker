@@ -1,0 +1,12 @@
+import { useState } from 'react'
+import type { FormEvent } from 'react'
+import { login, register, setToken, type User } from '../services/api'
+
+interface Props { onAuthenticated: (user:User)=>void }
+
+export default function Auth({onAuthenticated}:Props){
+ const [mode,setMode]=useState<'login'|'register'>('login')
+ const [name,setName]=useState(''); const [email,setEmail]=useState(''); const [password,setPassword]=useState(''); const [balance,setBalance]=useState('0'); const [error,setError]=useState(''); const [busy,setBusy]=useState(false)
+ async function submit(e:FormEvent){e.preventDefault();setError('');setBusy(true);try{const r=mode==='login'?await login({email,password}):await register({name,email,password,currentBankBalance:Number(balance)});setToken(r.token);onAuthenticated(r.user)}catch(err){setError(err instanceof Error?err.message:'Something went wrong')}finally{setBusy(false)}}
+ return <div className="auth-shell"><div className="auth-card"><div className="auth-brand"><div className="brand-icon">₹</div><div><h1>FinTrack</h1><p>Personal Finance</p></div></div><div className="auth-copy"><span className="auth-kicker">SECURE FINANCE TRACKING</span><h2>{mode==='login'?'Welcome back':'Create your account'}</h2><p>{mode==='login'?'Sign in to access your personal financial dashboard.':'Start tracking income, expenses, budgets and money owed.'}</p></div><form className="auth-form" onSubmit={submit}>{mode==='register'&&<label>Full name<input value={name} onChange={e=>setName(e.target.value)} required minLength={2} placeholder="Your name"/></label>}<label>Email<input type="email" value={email} onChange={e=>setEmail(e.target.value)} required placeholder="you@example.com"/></label><label>Password<input type="password" value={password} onChange={e=>setPassword(e.target.value)} required minLength={6} placeholder="At least 6 characters"/></label>{mode==='register'&&<label>Current bank balance (₹)<input type="number" min="0" step="0.01" value={balance} onChange={e=>setBalance(e.target.value)} required/></label>}{error&&<div className="auth-error">{error}</div>}<button className="auth-submit" disabled={busy}>{busy?'Please wait...':mode==='login'?'Sign in':'Create account'}</button></form><button className="auth-switch" onClick={()=>{setMode(mode==='login'?'register':'login');setError('')}}>{mode==='login'?"Don't have an account? Create one":"Already have an account? Sign in"}</button></div></div>
+}
