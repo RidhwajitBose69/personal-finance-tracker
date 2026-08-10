@@ -120,5 +120,14 @@ app.get('/api/debts/summary',authenticate,async(req:AuthRequest,res)=>{try{const
 
 app.get('/api/ai/insights',authenticate,async(req:AuthRequest,res)=>{try{const expenses=await Expense.find({userId:id(req.userId)}).sort({date:-1}).lean();res.json(await generateFinancialAdvice(expenses as any))}catch(e:any){console.error(e);res.status(500).json({message:'Failed to generate financial insights',error:e?.message||String(e)})}})
 
-mongoose.connect(MONGODB_URI).then(()=>console.log('MongoDB connected')).catch(e=>console.error('MongoDB connection error:',e))
-app.listen(PORT,()=>console.log(`Backend running on http://localhost:${PORT}`))
+mongoose.connect(MONGODB_URI)
+  .then(() => console.log('MongoDB connected'))
+  .catch(e => console.error('MongoDB connection error:', e))
+
+if (process.env.NODE_ENV !== 'production') {
+  app.listen(PORT, () => {
+    console.log(`Backend running on http://localhost:${PORT}`)
+  })
+}
+
+export default app
