@@ -1,5 +1,10 @@
 {
   "version": 2,
   "buildCommand": "npm install --prefix frontend && npm run build --prefix frontend",
-  "outputDirectory": "frontend/dist"
+  "outputDirectory": "frontend/dist",
+  "functions": {
+    "api/index.ts": {
+      "runtime": "nodejs24.x"
+    }
+  }
 }
